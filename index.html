@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Today</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #search {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tech Talks Today</h1>
+    <div id="search">
+        <label for="category">Filter by Category:</label>
+        <select id="category">
+            <option value="all">All</option>
+        </select>
+    </div>
+    <table id="schedule">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Title</th>
+                <th>Speaker(s)</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+        const talks = [
+            {
+                title: "The Future of Artificial Intelligence",
+                speakers: ["Jane Doe"],
+                categories: ["AI", "Machine Learning"],
+                duration: 60,
+                description: "A deep dive into the latest advancements in AI and what to expect in the coming years."
+            },
+            {
+                title: "Building Scalable Web Applications",
+                speakers: ["John Smith", "Peter Jones"],
+                categories: ["Web Development", "Scalability"],
+                duration: 60,
+                description: "Learn how to design and build web applications that can handle millions of users."
+            },
+            {
+                title: "Cybersecurity in the Modern Age",
+                speakers: ["Alice Williams"],
+                categories: ["Cybersecurity"],
+                duration: 60,
+                description: "An overview of the current cybersecurity landscape and how to protect your organization from threats."
+            },
+            {
+                title: "The Power of Quantum Computing",
+                speakers: ["Bob Brown"],
+                categories: ["Quantum Computing"],
+                duration: 60,
+                description: "Explore the mind-bending world of quantum computing and its potential to revolutionize technology."
+            },
+            {
+                title: "Data Science for Social Good",
+                speakers: ["Charlie Davis", "Diana Miller"],
+                categories: ["Data Science"],
+                duration: 60,
+                description: "Discover how data science is being used to address some of the world's most pressing social challenges."
+            },
+            {
+                title: "The Rise of Serverless Architecture",
+                speakers: ["Eve Wilson"],
+                categories: ["Web Development", "Serverless"],
+                duration: 60,
+                description: "A comprehensive guide to serverless architecture and how it can help you build more efficient and cost-effective applications."
+            }
+        ];
+
+        const scheduleBody = document.getElementById('schedule').getElementsByTagName('tbody')[0];
+        const categoryFilter = document.getElementById('category');
+
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function generateSchedule() {
+            let startTime = new Date();
+            startTime.setHours(10, 0, 0, 0);
+
+            talks.forEach((talk, index) => {
+                if (index === 3) {
+                    const lunchRow = scheduleBody.insertRow();
+                    lunchRow.innerHTML = `<td colspan="4" style="text-align:center; background-color: #f2f2f2;"><strong>Lunch Break (1 hour)</strong></td>`;
+                    startTime.setHours(startTime.getHours() + 1);
+                }
+
+                const row = scheduleBody.insertRow();
+                row.dataset.categories = talk.categories.join(',');
+
+                const timeCell = row.insertCell();
+                const endTime = new Date(startTime.getTime() + talk.duration * 60000);
+                timeCell.textContent = `${formatTime(startTime)} - ${formatTime(endTime)}`;
+
+                const titleCell = row.insertCell();
+                titleCell.textContent = talk.title;
+
+                const speakersCell = row.insertCell();
+                speakersCell.textContent = talk.speakers.join(', ');
+
+                const descriptionCell = row.insertCell();
+                descriptionCell.textContent = talk.description;
+
+                startTime = new Date(endTime.getTime() + 10 * 60000);
+            });
+        }
+
+        function populateCategories() {
+            const allCategories = new Set();
+            talks.forEach(talk => {
+                talk.categories.forEach(category => allCategories.add(category));
+            });
+
+            allCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        function filterTalks() {
+            const selectedCategory = categoryFilter.value;
+            const rows = scheduleBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.cells.length > 1) { // Not a lunch break row
+                    const categories = row.dataset.categories.split(',');
+                    if (selectedCategory === 'all' || categories.includes(selectedCategory)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        generateSchedule();
+        populateCategories();
+        categoryFilter.addEventListener('change', filterTalks);
+    </script>
+</body>
+</html>
